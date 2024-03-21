@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('email')->unique();
+            $table->string('email')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
+            $table->string('password')->nullable();
+            $table->rememberToken()->nullable();
             $table->timestamps();
         });
 
@@ -26,10 +26,8 @@ return new class extends Migration
             $table->string('titulo');
             $table->string('fonte');
             $table->string('cor');
-            $table->string('pergunta');
-            $table->string('tipo');
-            $table->string('resposta');
             $table->string('url_notificacao');
+            $table->string('limite_respostas')->nullable();;
             $table->timestamps();
         });
 

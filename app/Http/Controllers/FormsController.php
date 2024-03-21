@@ -92,6 +92,16 @@ class FormsController extends Controller
             $pergunta->id_forms = $requestData['id_forms'] ?? null;
             $pergunta->tipo_resposta = $requestData['tipo_resposta'];
             
+
+            if (!($requestData['tipo_resposta'] == 1 || $requestData['tipo_resposta'] == 2 || $requestData['tipo_resposta'] == 3)) {
+                return response()->json(['error' => 'Por favor insira um tipo_resposta valido. (1-simples  2-composta  3-estruturada).'], 400);
+            }
+            
+
+            $formExists = Forms::where('id', $requestData['id_forms'])->exists();
+            if (!$formExists) {
+                return response()->json(['error' => 'O id_forms fornecido não existe na tabela forms.'], 400);
+            }
             // Salvar a pergunta ou perguntas e respostas de acordo com o tipo de resposta
             switch ($requestData['tipo_resposta']) {
                 case 1:
@@ -100,13 +110,10 @@ class FormsController extends Controller
                         if (!isset($requestData['pergunta'])) {
                             return response()->json(['error' => 'Insira Pergunta'], 400);
                         }
-                        if (!isset($requestData['resposta'])) {
-                            return response()->json(['error' => 'Insira Resposta'], 400);
-                        }
+
                     }
                     // Salvar apenas uma resposta
                     $pergunta->pergunta = $requestData['pergunta'];
-                    $pergunta->resposta = $requestData['resposta'];
                     $pergunta->save();
                     break;                
 

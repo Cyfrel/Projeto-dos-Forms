@@ -14,8 +14,5 @@ class Perguntas extends Model
 
     protected $fillable = ['id_forms', 'tipo_resposta', 'pergunta', 'tipo', 'resposta'];
 
-    public function respostas()
-    {
-        return $this->hasMany(Resposta::class);
-    }
+    
 }
