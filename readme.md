@@ -70,6 +70,19 @@ Para areas com acesso que necessite token de autenticação, adicionar ao Header
               }
      ```
      2.GET"/show-user":
+    ```
+       Output:{
+                	"id": 5,
+                	"nome": "Nome de Teste",
+                	"email": "email",
+                	"email_verified_at": "datetime",
+                	"password": "password",
+                	"remember_token": "token",
+                	"created_at": "2024-03-22T14:24:44.000000Z",
+                	"updated_at": "2024-03-22T20:00:52.000000Z",
+                	"limite_respostas": "limite_respostas"
+                }
+    ```
    
    - Forms:
      3.POST"/create-forms"
