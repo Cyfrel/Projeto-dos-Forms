@@ -10,26 +10,26 @@ Esta api tem como objetivo gerenciar o backend de uma ferramenta de gerenciament
 ## Instalação
 
 1. Clone o repositório:
-
+```
 git clone https://github.com/Cyfrel/Projeto-dos-Forms/tree/main
-
+```
 2. Configure seu banco de dados no arquivo .env:
-
+```
 DB_CONNECTION=mysql
 DB_HOST=seu-host
 DB_PORT=sua-porta
 DB_DATABASE=seu-banco-de-dados
 DB_USERNAME=seu-usuario
 DB_PASSWORD=sua-senha
-
+```
 3.Execute as migrações do banco de dados para criar as tabelas necessárias:
-
+```
 php artisan migrate
-
+```
 4. Inicie o servidor embutido do Laravel:
-
+```
 php artisan serve
-
+```
 ## Funcionalidades Principais:
 
 1. Criação de Formulários: Os usuários podem criar formulários personalizados, especificando título, data de criação e atualização, estilo visual e perguntas a serem respondidas.
@@ -198,8 +198,9 @@ Para areas com acesso que necessite token de autenticação, adicionar ao Header
               		"updated_at": "2024-03-21T14:49:11.000000Z"
               	}
        ```
-
+```
 Contato
 Nome: Geraldo Fulgêncio de Oliveira Bisneto
 Email: fulgenciobisneto@gmail.com
 LinkedIn: https://www.linkedin.com/in/geraldobisneto/
+```
