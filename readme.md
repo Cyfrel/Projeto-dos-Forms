@@ -198,9 +198,11 @@ Para areas com acesso que necessite token de autenticação, adicionar ao Header
               		"updated_at": "2024-03-21T14:49:11.000000Z"
               	}
        ```
-```
+
 Contato
 Nome: Geraldo Fulgêncio de Oliveira Bisneto
+
 Email: fulgenciobisneto@gmail.com
+
 LinkedIn: https://www.linkedin.com/in/geraldobisneto/
-```
+
