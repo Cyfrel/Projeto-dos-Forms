@@ -60,6 +60,7 @@ Para areas com acesso que necessite token de autenticação, adicionar ao Header
 
    - User:
      1.POST"/create-user":
+     ```
        input: {
               	"nome": "Nome de Teste"
               }
@@ -67,11 +68,12 @@ Para areas com acesso que necessite token de autenticação, adicionar ao Header
        Output:{
               	"token": "YNBcrOlWUbw1WfR0KBS6HqM55XsGjozjLPRYoHsiwvpSCk7En7qJsrVOI3BJ"
               }
-     
+     ```
      2.GET"/show-user":
    
    - Forms:
      3.POST"/create-forms"
+     ```
        input: {
               	"titulo": "seu titulo",
             		"fonte": "sua fonte",
@@ -89,12 +91,13 @@ Para areas com acesso que necessite token de autenticação, adicionar ao Header
                 "created_at": "datetime",
                 "id": "id_fom"
               }
-              
+        ```
   
      4.GET"/show-forms"
 
      Filtro respostas: 0 - Todas as respostas e 1 - Apenas respostas de quem completou o formulário
 
+     ```
        input: {
                 "id": "Nome de Teste",
                 "filtro respostas": "filtro aqui"
@@ -117,9 +120,10 @@ Para areas com acesso que necessite token de autenticação, adicionar ao Header
                                          ]
                          }
                }
-     
+     ```
      
      5.GET"/list-forms"
+     ```
          Output:{
                  "form":{
                         "id": 1,
@@ -132,7 +136,7 @@ Para areas com acesso que necessite token de autenticação, adicionar ao Header
                   			"id_usuario": "id_usuario"
                         }
                 }
-     
+     ```
      6.POST"/create-perguntas"
 
      tipo_resposta: 1 - Simples(considera uma pergunta sem resposta pré cadastrada)
@@ -161,7 +165,7 @@ Para areas com acesso que necessite token de autenticação, adicionar ao Header
    
      
    - Respostas:
-     7.POST"/create-respostas"
+     7.POST"/create-respostas"```
            Input: {
                 		"id_forms": "id_formulario",
                 		"id_pergunta": "id_pergunta",
@@ -176,8 +180,9 @@ Para areas com acesso que necessite token de autenticação, adicionar ao Header
                   	"created_at": "datetime",
                   	"id": 44
                   }
-     
+         ```
      8.GET"list-respostas"
+     ```
          Input:{
                  "id_forms": "id_form"
                 }
