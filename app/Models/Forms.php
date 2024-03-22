@@ -14,7 +14,7 @@ class Forms extends Model
 
     // Colunas
     //protected $fillable = ['titulo', 'data_registro', 'fonte', 'cor', 'pergunta', 'resposta', 'url_notificacao'];
-    protected $fillable = [ 'titulo', 'fonte', 'cor', 'pergunta', 'tipo', 'resposta', 'url_notificacao'];
+    protected $fillable = [ 'titulo', 'fonte', 'cor', 'pergunta', 'tipo', 'resposta','id_usuario', 'url_notificacao'];
 
     
 }

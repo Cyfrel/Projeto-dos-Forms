@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Log;
 use App\Models\Respostas;
 use App\Models\Forms;
 use App\Models\Users;
@@ -14,8 +14,27 @@ class RespostasController extends Controller
     public function list(Request $request)
     {   
         try {
-            $id_form = $request->query('id_forms');
-            $respostas = Respostas::where('id_forms', $id_form)->get();
+            $id_form = $request->json()->get('id_forms');
+
+            $token = $request->header('Authorization');
+
+            // Busca o usuário com base no token
+            $user = Users::where('remember_token', $token)->first();
+
+            if ($user) {
+                // Verifica se o usuário possui o formulário com o ID fornecido
+                $form = Forms::where('id', $id_form)
+                            ->where('id_usuario', $user->id)
+                            ->first();
+
+                if ($form) {
+                    // Busca as respostas apenas se o usuário possuir o formulário com o ID fornecido
+                    $respostas = Respostas::where('id_forms', $id_form)->get();
+                } else {
+
+                    return response()->json(['error' => 'Usuário não criou o formulario inserido'], 404);
+                }
+            }
 
             if ($respostas->isEmpty()) {
                 return response()->json(['error' => 'Nenhuma resposta encontrada para o ID de formulário fornecido'], 404);
@@ -27,65 +46,55 @@ class RespostasController extends Controller
         }
     }
 
-    /* funcionando sem verificar se formulario existe
+
     public function create(Request $request)
     {
         try {
             // Analisar o JSON recebido
             $requestData = $request->json()->all();
 
-            // Criar uma nova instância da model Respostas com os dados recebidos
-            $resposta = new Respostas();
+
+            if (empty($requestData['id_forms']) || !isset($requestData['id_forms'])) {
+                return response()->json(['error' => 'Favor prencheer id_forms.'], 400);
+            }
             
-            // Atribuir os valores do JSON aos campos da model
-            $resposta->id_forms = $requestData['id_forms'] ?? null;
-            $resposta->id_pergunta = $requestData['id_pergunta'] ?? null;
-            $resposta->id_usuario = $requestData['id_usuario'] ?? null;
-            $resposta->resposta = $requestData['resposta'] ?? null;
+            // Busca o registro do formulário pelo ID
+            $form = Forms::findOrFail($requestData['id_forms']);
 
-            // Verificar se o campo id_pergunta está presente e se a resposta não está vazia
-            if (!isset($requestData['id_pergunta'])) {
-                return response()->json(['error' => 'Certifique-se de incluir o id_pergunta.'], 400);
+            $token = $request->header('Authorization');
+
+            $id_usuario_criador = $form->id_usuario;
+            
+            if (empty($form) || !isset($form)) {
+                return response()->json(['error' => 'Formulário não encontrado.'], 400);
             }
-
-            if (empty($requestData['resposta'])) {
-                return response()->json(['error' => 'Certifique-se de incluir a resposta.'], 400);
+            
+            // Busca o usuário com base no token
+            $user = Users::where('remember_token', $token)->first();
+            
+            if (!$user) {
+                return response()->json(['error' => 'Usuário não encontrado.'], 400);
             }
+            
 
-            if (empty($requestData['id_forms'])) {
-                return response()->json(['error' => 'Certifique-se de incluir id_forms.'], 400);
+            
+            // Verifica se o usuário é o criador do formulário
+            if ($form->id_usuario != $user->id) {
+                return response()->json(['error' => 'Você não tem permissão para acessar este formulário.'], 403);
             }
-
-            if (empty($requestData['id_usuario'])) {
-                return response()->json(['error' => 'Certifique-se de incluir id_usuario.'], 400);
-            }
-
-            // Salvar a nova instância no banco de dados
-            $resposta->save();
-
-            return response()->json($resposta, 201); // 201 significa Created
-        } catch (\Exception $exception) {
-            return response()->json(['error' => 'Erro ao inserir a resposta. Por favor, tente novamente.'], 500); // 500 significa Internal Server Error
-        }
-    }*/
-
-
-    public function create(Request $request)
-    {
-        try {
-            // Analisar o JSON recebido
-            $requestData = $request->json()->all();
 
             // Verificar se estamos no primeiro dia do mês
             if (date('d') == 1) {
                 // Atualizar o campo "limite_respostas" para "0" na tabela "forms"
-                Forms::where('id', $requestData['id_forms'])->update(['limite_respostas' => 100]);
+
+                $form = Forms::find($requestData['id_forms']);
+                Users::where('id', $user->id)->update(['limite_respostas' => 100]);
             }
 
             // Verificar se o usuário respondeu todas as perguntas do formulário
             $totalPerguntas = Perguntas::where('id_forms', $requestData['id_forms'])->count();
             $totalRespostasUsuario = Respostas::where('id_forms', $requestData['id_forms'])
-                ->where('id_usuario', $requestData['id_usuario'])
+                ->where('id_usuario', $user->id)
                 ->count();
 
             if ($totalRespostasUsuario >= $totalPerguntas) {
@@ -97,7 +106,7 @@ class RespostasController extends Controller
                 ->count();
 
             // Verificar o limite de respostas permitido para o formulário
-            $limiteRespostas = Forms::where('id', $requestData['id_forms'])->value('limite_respostas');
+            $limiteRespostas = Users::where('id', $id_usuario_criador)->value('limite_respostas');
 
             if ($totalRespostas >= $limiteRespostas) {
                 return response()->json(['error' => 'O número máximo de respostas para este formulário já foi atingido.'], 400);
@@ -118,7 +127,7 @@ class RespostasController extends Controller
                 return response()->json(['error' => 'Certifique-se de incluir a resposta.'], 400);
             }
 
-            if (empty($requestData['id_usuario'])) {
+            if (empty($user->id)) {
                 return response()->json(['error' => 'Certifique-se de incluir id_usuario.'], 400);
             }
 
@@ -127,7 +136,7 @@ class RespostasController extends Controller
                 return response()->json(['error' => 'O id_forms fornecido não existe na tabela forms.'], 400);
             }
 
-            $formExists = Users::where('id', $requestData['id_usuario'])->exists();
+            $formExists = Users::where('id', $user->id)->exists();
             if (!$formExists) {
                 return response()->json(['error' => 'O id_usuario fornecido não existe na tabela Users.'], 400);
             }
@@ -141,7 +150,7 @@ class RespostasController extends Controller
             // Verificar se o usuário já respondeu a essa pergunta
             $existingResponse = Respostas::where('id_forms', $requestData['id_forms'])
                 ->where('id_pergunta', $requestData['id_pergunta'])
-                ->where('id_usuario', $requestData['id_usuario'])
+                ->where('id_usuario', $user->id)
                 ->exists();
 
             if ($existingResponse) {
@@ -155,7 +164,7 @@ class RespostasController extends Controller
             // Atribuir os valores do JSON aos campos da model
             $resposta->id_forms = $requestData['id_forms'];
             $resposta->id_pergunta = $requestData['id_pergunta'] ?? null;
-            $resposta->id_usuario = $requestData['id_usuario'] ?? null;
+            $resposta->id_usuario = $user->id ?? null;
             $resposta->resposta = $requestData['resposta'] ?? null;
 
             // Salvar a nova instância no banco de dados
@@ -163,121 +172,15 @@ class RespostasController extends Controller
 
             
             // Decrementar limite de respostas
-            Forms::where('id', $requestData['id_forms'])->decrement('limite_respostas');
+            Users::where('id', $id_usuario_criador)->decrement('limite_respostas');
             
 
             return response()->json($resposta, 201); // 201 significa Created
-        } catch (\Exception $exception) {
-            return response()->json(['error' => 'Erro ao inserir a resposta. Por favor, tente novamente.'], 500); // 500 significa Internal Server Error
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $exception) {
+            // Tratar o erro quando o formulário não for encontrado
+            return response()->json(['error' => 'O formulário com o ID ' . $requestData['id_forms'] . ' não foi encontrado.'], 404); // 404 significa Not Found
         }
     }
-
-    /* verifica se usuario existe
-    public function create(Request $request)
-    {
-        try {
-            // Analisar o JSON recebido
-            $requestData = $request->json()->all();
-
-            // Verificar se o campo id_forms está presente e se ele existe na tabela forms
-            if (!isset($requestData['id_forms'])) {
-                return response()->json(['error' => 'Certifique-se de incluir o id_forms.'], 400);
-            }
-
-            $formExists = Forms::where('id', $requestData['id_forms'])->exists();
-            if (!$formExists) {
-                return response()->json(['error' => 'O id_forms fornecido não existe na tabela forms.'], 400);
-            }
-
-            $formExists = Users::where('id', $requestData['id_usuario'])->exists();
-            if (!$formExists) {
-                return response()->json(['error' => 'O id_usuario fornecido não existe na tabela Users.'], 400);
-            }
-
-            // Criar uma nova instância da model Respostas com os dados recebidos
-            $resposta = new Respostas();
-            
-            // Atribuir os valores do JSON aos campos da model
-            $resposta->id_forms = $requestData['id_forms'];
-            $resposta->id_pergunta = $requestData['id_pergunta'] ?? null;
-            $resposta->id_usuario = $requestData['id_usuario'] ?? null;
-            $resposta->resposta = $requestData['resposta'] ?? null;
-
-            // Verificar se o campo id_pergunta está presente e se a resposta não está vazia
-            if (!isset($requestData['id_pergunta'])) {
-                return response()->json(['error' => 'Certifique-se de incluir o id_pergunta.'], 400);
-            }
-
-            if (empty($requestData['resposta'])) {
-                return response()->json(['error' => 'Certifique-se de incluir a resposta.'], 400);
-            }
-
-            if (empty($requestData['id_usuario'])) {
-                return response()->json(['error' => 'Certifique-se de incluir id_usuario.'], 400);
-            }
-
-            // Salvar a nova instância no banco de dados
-            $resposta->save();
-
-            return response()->json($resposta, 201); // 201 significa Created
-        } catch (\Exception $exception) {
-            return response()->json(['error' => 'Erro ao inserir a resposta. Por favor, tente novamente.'], 500); // 500 significa Internal Server Error
-        }
-    }*/
-
-    /* verifica se usuario ja respondeu a pergunta
-    public function create(Request $request)
-    {
-        try {
-            // Analisar o JSON recebido
-            $requestData = $request->json()->all();
-
-            // Verificar se os campos obrigatórios estão presentes
-            if (!isset($requestData['id_forms'], $requestData['id_pergunta'], $requestData['id_usuario'], $requestData['resposta'])) {
-                return response()->json(['error' => 'Certifique-se de incluir todos os campos obrigatórios: id_forms, id_pergunta, id_usuario e resposta.'], 400);
-            }
-
-            // Verificar se o campo id_forms existe na tabela forms
-            $formExists = Forms::where('id', $requestData['id_forms'])->exists();
-            if (!$formExists) {
-                return response()->json(['error' => 'O id_forms fornecido não existe na tabela forms.'], 400);
-            }
-
-            // Verificar se o campo id_usuario existe na tabela users
-            $userExists = Users::where('id', $requestData['id_usuario'])->exists();
-            if (!$userExists) {
-                return response()->json(['error' => 'O id_usuario fornecido não existe na tabela Users.'], 400);
-            }
-
-            // Verificar se o usuário já respondeu a essa pergunta
-            $existingResponse = Respostas::where('id_forms', $requestData['id_forms'])
-                ->where('id_pergunta', $requestData['id_pergunta'])
-                ->where('id_usuario', $requestData['id_usuario'])
-                ->exists();
-
-            if ($existingResponse) {
-                return response()->json(['error' => 'O usuário já respondeu esta pergunta.'], 400);
-            }
-
-            // Criar uma nova instância da model Respostas com os dados recebidos
-            $resposta = new Respostas();
-            
-            // Atribuir os valores do JSON aos campos da model
-            $resposta->id_forms = $requestData['id_forms'];
-            $resposta->id_pergunta = $requestData['id_pergunta'];
-            $resposta->id_usuario = $requestData['id_usuario'];
-            $resposta->resposta = $requestData['resposta'];
-
-            // Salvar a nova instância no banco de dados
-            $resposta->save();
-
-            return response()->json($resposta, 201); // 201 significa Created
-        } catch (\Exception $exception) {
-            return response()->json(['error' => 'Erro ao inserir a resposta. Por favor, tente novamente.'], 500); // 500 significa Internal Server Error
-        }
-    }*/
-
-
 
 
 }
