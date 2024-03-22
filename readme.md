@@ -165,7 +165,8 @@ Para areas com acesso que necessite token de autenticação, adicionar ao Header
    
      
    - Respostas:
-     7.POST"/create-respostas"```
+     7.POST"/create-respostas"
+     ```
            Input: {
                 		"id_forms": "id_formulario",
                 		"id_pergunta": "id_pergunta",
@@ -180,7 +181,7 @@ Para areas com acesso que necessite token de autenticação, adicionar ao Header
                   	"created_at": "datetime",
                   	"id": 44
                   }
-         ```
+     ```
      8.GET"list-respostas"
      ```
          Input:{
@@ -196,7 +197,7 @@ Para areas com acesso que necessite token de autenticação, adicionar ao Header
               		"created_at": "2024-03-21T14:49:11.000000Z",
               		"updated_at": "2024-03-21T14:49:11.000000Z"
               	}
-   
+       ```
 
 Contato
 Nome: Geraldo Fulgêncio de Oliveira Bisneto
