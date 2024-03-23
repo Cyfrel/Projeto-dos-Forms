@@ -9,6 +9,8 @@
 <body>
     <div id="app">
         <!-- Conteúdo da sua aplicação -->
+
+        <p>{{$data['message']}}
     </div>
 
     <!-- Adicione o token CSRF como um atributo de data para que você possa acessá-lo com JavaScript -->

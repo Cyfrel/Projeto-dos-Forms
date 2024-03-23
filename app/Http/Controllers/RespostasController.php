@@ -6,8 +6,11 @@ use App\Models\Respostas;
 use App\Models\Forms;
 use App\Models\Users;
 use App\Models\Perguntas;
+use App\Models\Contact;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Mail\ContactMailable;
+use Illuminate\Support\Facades\Mail;
 
 class RespostasController extends Controller
 {
@@ -98,6 +101,50 @@ class RespostasController extends Controller
                 ->count();
 
             if ($totalRespostasUsuario >= $totalPerguntas) {
+
+                if ($user->email) {
+
+                    // Envie o webhook aqui
+                    $httpClient = new \GuzzleHttp\Client();
+
+                    $totalRespostasUsuariosend = Respostas::where('id_forms', $requestData['id_forms'])
+                    ->where('id_usuario', $user->id)
+                    ->get();
+
+                    $respostasArray = $totalRespostasUsuariosend->toArray();
+
+                    $response = $httpClient->post($form->url_notificacao, [
+                        'json' => [
+                            'user_id' => $user->id,
+                            'form_id' => $requestData['id_forms'],
+                            'respostas' => $respostasArray,
+                            // Outros dados que você deseja enviar no webhook, se houver
+                        ]
+                    ]);
+                    
+                    // Verifica se o webhook foi enviado com sucesso (código de status HTTP 200)
+                    if ($response->getStatusCode() === 200) {
+                        // Registro de log ou qualquer outra ação que você deseja tomar se o webhook for enviado com sucesso
+                        Log::info('Webhook enviado com sucesso para o usuário ' . $form->id_usuario);
+                    } else {
+                        // Registro de log ou tratamento de erro se o webhook não for enviado com sucesso
+                        Log::error('Falha ao enviar o webhook para o usuário ' . $form->id_usuario);
+                    }
+
+
+
+                    
+
+                    $send = Mail::to(users: $user->email, name: $user->nome)->send(mailable: new ContactMailable(data: [
+                        'fromName' => $user->id,
+                        'fromEmail' => 'emailderecompensas001@gmail.com',
+                        'subject' => 'Formulário respondido',
+                        'message' => 'Usuario: '.$user->id.' Respondeu o seu formulario:'.$requestData['id_forms'],
+                    ]));
+                }else{
+                    return response()->json(['error' => 'O dono do form não possui email cadastrado para receber emails.'], 400);
+                }
+
                 return response()->json(['error' => 'O usuário já respondeu todas as perguntas deste formulário.'], 400);
             }
 
