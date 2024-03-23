@@ -70,7 +70,7 @@ Para areas com acesso que necessite token de autenticação, adicionar ao Header
               }
      ```
      2.GET"/show-user":
-    ```
+     ```
        Output:{
                 	"id": 5,
                 	"nome": "Nome de Teste",
@@ -82,7 +82,7 @@ Para areas com acesso que necessite token de autenticação, adicionar ao Header
                 	"updated_at": "2024-03-22T20:00:52.000000Z",
                 	"limite_respostas": "limite_respostas"
                 }
-    ```   
+     ```   
    - Forms:
      3.POST"/create-forms"
      ```
@@ -132,6 +132,7 @@ Para areas com acesso que necessite token de autenticação, adicionar ao Header
                             			}
                                      ]
                          }
+                 }
      ```
      
      5.GET"/list-forms"
