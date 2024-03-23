@@ -22,16 +22,26 @@ DB_DATABASE=seu-banco-de-dados
 DB_USERNAME=seu-usuario
 DB_PASSWORD=sua-senha
 ```
-3.Execute as migrações do banco de dados para criar as tabelas necessárias:
+
+3. Configure seu mailer no arquivo .env:
+```
+MAIL_MAILER=
+MAIL_HOST=
+MAIL_PORT=
+MAIL_USERNAME=
+MAIL_PASSWORD=
+```
+
+4.Execute as migrações do banco de dados para criar as tabelas necessárias:
 ```
 php artisan migrate
 ```
-4. Inicie o servidor embutido do Laravel:
+5. Inicie o servidor embutido do Laravel:
 ```
 php artisan serve
 ```
 
-5. Execute as Seeds:
+6. Execute as Seeds:
 ```
 php artisan db:seed UsersSeeder
 
