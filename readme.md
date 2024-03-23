@@ -30,6 +30,15 @@ php artisan migrate
 ```
 php artisan serve
 ```
+
+5. Execute as Seeds:
+```
+php artisan db:seed UsersSeeder
+
+php artisan db:seed FormsSeeder
+
+php artisan db:seed RespostasSeeder   <- Aviso: Devido ao Grande volume de respostas pode demorar alguns minutos para gerar todos os registros
+```
 ## Funcionalidades Principais:
 
 1. Criação de Formulários: Os usuários podem criar formulários personalizados, especificando título, data de criação e atualização, estilo visual e perguntas a serem respondidas.
@@ -179,6 +188,10 @@ Para areas com acesso que necessite token de autenticação, adicionar ao Header
      
    - Respostas:
      7.POST"/create-respostas"
+
+     * Caso o usuário termine de responder todas as perguntas um email é enviado para o email do criador do formulário(cadastrado na tabela users) e um webhook é enviado para o "url_notificacao" cadastrado na tabela forms
+
+     * O limitador de não permitir novas respostas caso o dono do form tenha chegado ao seu limite e também a liberação de limite no dia primeiro só ativam caso execute post.
      ```
            Input: {
                 		"id_forms": "id_formulario",
