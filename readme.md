@@ -82,8 +82,7 @@ Para areas com acesso que necessite token de autenticação, adicionar ao Header
                 	"updated_at": "2024-03-22T20:00:52.000000Z",
                 	"limite_respostas": "limite_respostas"
                 }
-    ```
-   
+    ```   
    - Forms:
      3.POST"/create-forms"
      ```
@@ -112,27 +111,27 @@ Para areas com acesso que necessite token de autenticação, adicionar ao Header
 
      ```
        input: {
-                "id": "Nome de Teste",
+                "id": "id do formulario",
                 "filtro respostas": "filtro aqui"
               }
      
        Output: {
-                  "form":{
-                            "id":"id_form",
-                            "titulo":"titulo_do_form",
-                            "perguntas": [
-                                           {
-                                             "id": "id_pergunta",
-                                             "respostas":[
-                                                           {
-                                                            "id_usuario":"id_usuario",
-                                                            "respostas":"resposta
-                                                           }
-                                                         ]
-                                           }
-                                         ]
+            	"form": {
+                		"id": 1,
+                		"titulo": "AlteradoCom@sucess.com",
+                		"perguntas": [
+                            			{
+                            				"id": 1,
+                            				"pergunta": "casa",
+                            				"respostas": [
+                            					{
+                            						"id_usuario": "1",
+                            						"resposta": "ble"
+                            					}
+                            				]
+                            			}
+                                     ]
                          }
-               }
      ```
      
      5.GET"/list-forms"
