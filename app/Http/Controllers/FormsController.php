@@ -192,6 +192,7 @@ class FormsController extends Controller
                             ->where('id_usuario', $user->id)
                             ->first();
 
+                            
                 if ($form) {
                     // Busca as respostas apenas se o usuário possuir o formulário com o ID fornecido
                     // Carrega as perguntas relacionadas ao formulário
