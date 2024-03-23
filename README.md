@@ -1,66 +1,221 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Projeto dos Formulários
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Esta api tem como objetivo gerenciar o backend de uma ferramenta de gerenciamento de formulários personalizados online.
 
-## About Laravel
+## Pré-requisitos
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- PHP 
+- Banco de dados MySQL
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Instalação
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+1. Clone o repositório:
+```
+git clone https://github.com/Cyfrel/Projeto-dos-Forms/tree/main
+```
+2. Configure seu banco de dados no arquivo .env:
+```
+DB_CONNECTION=mysql
+DB_HOST=seu-host
+DB_PORT=sua-porta
+DB_DATABASE=seu-banco-de-dados
+DB_USERNAME=seu-usuario
+DB_PASSWORD=sua-senha
+```
+3.Execute as migrações do banco de dados para criar as tabelas necessárias:
+```
+php artisan migrate
+```
+4. Inicie o servidor embutido do Laravel:
+```
+php artisan serve
+```
+## Funcionalidades Principais:
 
-## Learning Laravel
+1. Criação de Formulários: Os usuários podem criar formulários personalizados, especificando título, data de criação e atualização, estilo visual e perguntas a serem respondidas.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+2. Listagem de Formulários: Os usuários têm acesso a uma lista de todos os formulários que criaram, juntamente com o total de pessoas que responderam a pelo menos uma pergunta em cada formulário.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+3. Recebimento e Armazenamento de Respostas: O sistema é capaz de receber e armazenar as respostas dos formulários, incluindo o gerenciamento de respostas incompletas.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+4. Visualização de Respostas: Os usuários podem visualizar todas as respostas de um formulário de forma amigável para o frontend, com opção de filtrar os resultados para listar todas as pessoas ou apenas aquelas que responderam todas as perguntas do formulário.
 
-## Laravel Sponsors
+5. Notificação de Respostas: Quando um formulário é respondido por completo, o proprietário do formulário recebe um e-mail de notificação e um webhook é enviado para uma URL específica contendo as perguntas e respostas da pessoa que preencheu o formulário.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+6. Controle de Consumo: Implementação de um limite de respostas por mês para cada usuário, com um limite compartilhado entre todos os formulários do usuário. Após atingir o limite, novas respostas não são aceitas até o próximo mês.
 
-### Premium Partners
+7. Segurança de acesso: os usuários só possuem permissão para acessar as informações relacionadas aos seus formulários cadastrados e a sua conta.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
 
-## Contributing
+## Arquitetura e Escalabilidade:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+1. Armazenamento de Dados: O sistema é projetado para lidar com grande volume de dados, permitindo que cada formulário armazene milhares de respostas.
+Além disso, é considerada a possibilidade de um mesmo usuário ter centenas de formulários e um mesmo formulário ter centenas de perguntas.
 
-## Code of Conduct
+2. Endpoints e Rotas:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Os dados devem ser enviados em formato Json e também serão retornados neste formato.
 
-## Security Vulnerabilities
+Para areas com acesso que necessite token de autenticação, adicionar ao Header: "Authorization" e "token de um usuário cadastrado".
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+   - User:
+     1.POST"/create-user":
+     ```
+       input: {
+              	"nome": "Nome de Teste"
+              }
 
-## License
+       Output:{
+              	"token": "YNBcrOlWUbw1WfR0KBS6HqM55XsGjozjLPRYoHsiwvpSCk7En7qJsrVOI3BJ"
+              }
+     ```
+     2.GET"/show-user":
+    ```
+       Output:{
+                	"id": 5,
+                	"nome": "Nome de Teste",
+                	"email": "email",
+                	"email_verified_at": "datetime",
+                	"password": "password",
+                	"remember_token": "token",
+                	"created_at": "2024-03-22T14:24:44.000000Z",
+                	"updated_at": "2024-03-22T20:00:52.000000Z",
+                	"limite_respostas": "limite_respostas"
+                }
+    ```   
+   - Forms:
+     3.POST"/create-forms"
+     ```
+       input: {
+              	"titulo": "seu titulo",
+            		"fonte": "sua fonte",
+            		"cor": "cor",
+            	 	"url_notificacao": "url_teste"
+              }
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+       Output:{
+                "titulo": "seu titulo",
+                "fonte": "sua fonte",
+                "cor": "cor",
+                "id_usuario": "idaqui",
+                "url_notificacao": "url_teste",
+                "updated_at": "datetime",
+                "created_at": "datetime",
+                "id": "id_fom"
+              }
+        ```
+  
+     4.GET"/show-forms"
+
+     Filtro respostas: 0 - Todas as respostas e 1 - Apenas respostas de quem completou o formulário
+
+     ```
+       input: {
+                "id": "id do formulario",
+                "filtro respostas": "filtro aqui"
+              }
+     
+       Output: {
+            	"form": {
+                		"id": 1,
+                		"titulo": "AlteradoCom@sucess.com",
+                		"perguntas": [
+                            			{
+                            				"id": 1,
+                            				"pergunta": "casa",
+                            				"respostas": [
+                            					{
+                            						"id_usuario": "1",
+                            						"resposta": "ble"
+                            					}
+                            				]
+                            			}
+                                     ]
+                         }
+     ```
+     
+     5.GET"/list-forms"
+     ```
+         Output:{
+                 "form":{
+                        "id": 1,
+                  			"titulo": "titulo_form",
+                  			"fonte": "fonte",
+                  			"cor": "cor",
+                  			"url_notificacao": "url_notificacao",
+                  			"created_at": "datetime",
+                  			"updated_at": "datetime",
+                  			"id_usuario": "id_usuario"
+                        }
+                }
+     ```
+     6.POST"/create-perguntas"
+
+     tipo_resposta: 1 - Simples(considera uma pergunta sem resposta pré cadastrada)
+                    2 - Composta(considera uma pergunta e apartir de duas respostas)
+                    3 - Estruturada(considera apartir de duas perguntas sem nenhuma resposta pré cadastrada)
+
+     perguntas e respostas: Seguindo a descrição acima e o exemplo abaixo dependendo de qual tipo de resposta escolher você pode adicionar mais respostas adicionando um numero ao lado da "resposta e mais perguntas adicionando ao lado de "pergunta".
+
+          Input:{
+                  "id_forms": "1",
+                  "tipo_resposta": "3",
+                  "pergunta": "casa",
+                  "pergunta1": "casa",
+                  "resposta": "teste",
+                  "resposta1": "2teste"
+                 }
+
+           Output:"pergunta": {
+                  "id_forms": "1",
+                  "tipo_resposta": "3",
+                  "pergunta": "casa,casa",
+                  "updated_at": "2024-03-22T19:20:05.000000Z",
+                  "created_at": "2024-03-22T19:20:05.000000Z",
+                  "id": 34
+                }
+   
+     
+   - Respostas:
+     7.POST"/create-respostas"
+     ```
+           Input: {
+                		"id_forms": "id_formulario",
+                		"id_pergunta": "id_pergunta",
+                		"resposta": "resposta"
+                	}
+           Output:{
+                  	"id_forms": "id_form",
+                  	"id_pergunta": "id_pergunta",
+                  	"id_usuario": "id_usuario",
+                  	"resposta": "resposta",
+                  	"updated_at": "datetime",
+                  	"created_at": "datetime",
+                  	"id": 44
+                  }
+     ```
+     8.GET"list-respostas"
+     ```
+         Input:{
+                 "id_forms": "id_form"
+                }
+
+         Output:{
+              		"id": "id_resposta",
+              		"id_forms": "id_form",
+              		"id_pergunta": "id_pergunta",
+              		"id_usuario": "id_usuario",
+              		"resposta": "resposta",
+              		"created_at": "2024-03-21T14:49:11.000000Z",
+              		"updated_at": "2024-03-21T14:49:11.000000Z"
+              	}
+       ```
+
+Contato
+
+Nome: Geraldo Fulgêncio de Oliveira Bisneto
+
+Email: fulgenciobisneto@gmail.com
+
+LinkedIn: https://www.linkedin.com/in/geraldobisneto/
+
