@@ -43,10 +43,19 @@ class UsersFormsController extends Controller
     public function show(Request $request)
     {   
         try {
-            $id = $request->query('id');
-            $user = Users::findOrFail($id);
-        
-            return response()->json($user);
+            $token = $request->header('Authorization');
+
+            // Busca o usuário com base no token
+            $user = Users::where('remember_token', $token)->first();
+
+            if ($user) {
+
+                return response()->json($user);
+                
+            }else{
+                
+                return response()->json(['error' => 'Usuário não cadastrado'], 404);
+            }
         } catch (ModelNotFoundException $exception) {
             return response()->json(['error' => 'Usuário não encontrado'], 404);
         }

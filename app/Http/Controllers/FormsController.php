@@ -159,14 +159,22 @@ class FormsController extends Controller
             return response()->json(['error' => 'Erro ao criar o formulário'], 500); // 500 significa Internal Server Error
         }
     }
-   
-
+      
+    
     public function show(Request $request)
     {   
         try {
             $id = $request->input('id');
             $filtro_respostas = $request->input('filtro respostas');
+            if (!isset($id)) {
+               
+                return response()->json(['error' => 'Favor definir id '], 404);
+            }
 
+            if (!isset($filtro_respostas)) {
+               
+                return response()->json(['error' => 'Favor definir "filtro respostas" '], 404);
+            }
 
             // Carrega o formulário com as informações de título
             $form = Forms::findOrFail($id);
@@ -189,6 +197,7 @@ class FormsController extends Controller
                     // Carrega as perguntas relacionadas ao formulário
                     $perguntas = Perguntas::where('id_forms', $id)->get();
                     $numPerguntas = count($perguntas);
+                    //dd($numPerguntas);
                     // Carrega as respostas relacionadas ao formulário
                     $respostas = Respostas::where('id_forms', $id)->get();
 
@@ -213,28 +222,54 @@ class FormsController extends Controller
                     }
 
                     // Mapeia as perguntas e suas respostas correspondentes, incluindo o contador de respostas por usuário
-                    $perguntasComRespostas = $perguntas->map(function ($pergunta) use ($respostas, $respostasPorUsuario) {
-                        $respostasPergunta = $respostas->where('id_pergunta', $pergunta->id)->map(function ($resposta) use ($respostasPorUsuario) {
-                            return [
-                                'id_usuario' => $resposta->id_usuario,
-                                'resposta' => $resposta->resposta,
-                            ];
-                        })->values()->toArray();
+                    $perguntasComRespostas = $perguntas->map(function ($pergunta) use ($respostas, $respostasPorUsuario, $numPerguntas,$filtro_respostas) {
+                        
+                       
 
-                        // Inclui o contador de respostas por usuário
-                        $contadorRespostasPorUsuario = [];
-                        foreach ($respostasPorUsuario as $idUsuario => $numRespostas) {
-                            $contadorRespostasPorUsuario[] = [
-                                'id_usuario' => $idUsuario,
-                                'quantidade_respostas' => $numRespostas,
-                            ];
-                        }
+                    // Inclui o contador de respostas por usuário
+                    $contadorRespostasPorUsuario = [];
+                    foreach ($respostasPorUsuario as $idUsuario => $numRespostas) {
+                        $contadorRespostasPorUsuario[$idUsuario] = $numRespostas;
+                    }
 
+
+                    if($filtro_respostas == 1){
+                        $respostasPergunta = $respostas->where('id_pergunta', $pergunta->id)->map(function ($resposta) use ($contadorRespostasPorUsuario, $numPerguntas) {
+                            // Verifica se a quantidade de respostas do usuário é igual a $numPerguntas
+                            if ($contadorRespostasPorUsuario[$resposta->id_usuario] >= $numPerguntas) {
+                                return [
+                                    'id_usuario' => $resposta->id_usuario,
+                                    'resposta' => $resposta->resposta,
+                                ];
+                            }
+                            // Se a quantidade de respostas do usuário não for igual a $numPerguntas, retorna null
+                            return null;
+                        })->filter();
+                    }elseif($filtro_respostas == 0){
+                        $respostasPergunta = $respostas->where('id_pergunta', $pergunta->id)->map(function ($resposta) use ($contadorRespostasPorUsuario) {
+                            // Verifica se a quantidade de respostas do usuário é igual a $numPerguntas
+                            if ($contadorRespostasPorUsuario[$resposta->id_usuario] >= 1) {
+                                return [
+                                    'id_usuario' => $resposta->id_usuario,
+                                    'resposta' => $resposta->resposta,
+                                ];
+                            }
+                            // Se a quantidade de respostas do usuário não for igual a $numPerguntas, retorna null
+                            return null;
+                        })->filter();
+                    }else{
+                        return response()->json(['error' => 'Favor definir "filtro respostas" '], 404);
+                        
+                    }
+
+                    $respostasPergunta = $respostasPergunta->values()->toArray(); // Resetar índices de array
+
+                        
                         return [
                             'id' => $pergunta->id,
                             'pergunta' => $pergunta->pergunta,
                             'respostas' => $respostasPergunta,
-                            'contador_respostas_por_usuario' => $contadorRespostasPorUsuario,
+                            //'contador_respostas_por_usuario' => $contadorRespostasPorUsuario,
                         ];
                     });
 
@@ -259,9 +294,6 @@ class FormsController extends Controller
             return response()->json(['error' => 'Formulário não encontrado'], 404);
         }
     }
-
-    
-
 
 
 
