@@ -243,7 +243,7 @@ class FormsController extends Controller
                             $respostasPergunta = $respostas->where('id_pergunta', $pergunta->id)->map(function ($resposta) use ($contadorRespostasPorUsuario, $numPerguntas, $contadorRespostasTotal) {
                                 // Verifica se a quantidade de respostas do usuário é igual a $numPerguntas
                                 if ($contadorRespostasPorUsuario[$resposta->id_usuario] >= $numPerguntas) {
-                                    dd($resposta->id_usuario);
+                                    //dd($resposta->id_usuario);
                                     return [
                                         'id_usuario' => $resposta->id_usuario,
                                         'resposta' => $resposta->resposta,
