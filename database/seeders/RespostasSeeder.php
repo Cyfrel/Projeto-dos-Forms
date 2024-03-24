@@ -8,49 +8,76 @@ use App\Models\Respostas;
 
 class RespostasSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-
-        $numeroForms = 200; // Altere para o número desejado de registros
+        $numeroForms = 200;
         $numeroRespostas = 10000;
-        // Loop para criar e inserir os registros na tabela
+
         for ($i = 1; $i <= $numeroForms; $i++) {
             for ($y = 1; $y <= $numeroRespostas; $y++) {
+                $id_usuario = $this->generateUniqueRandomNumeric(6);
+
                 Respostas::create([
-                    'id_forms' => $i, // Gera um nome aleatório de 10 caracteres
+                    'id_forms' => $i,
                     'id_pergunta' => $i,
-                    'id_usuario' => $this->generateRandomNumeric(4), 
-                    'resposta' => $this->generateRandomString(10), // Gera um nome aleatório de 10 caracteres
+                    'id_usuario' => $id_usuario,
+                    'resposta' => $this->generateRandomString(10),
                 ]);
             }
         }
 
-        $numeroForms2 = 1; // Altere para o número desejado de registros
+        $numeroForms2 = 1;
         $numeroRespostas2 = 100000;
-        // Loop para criar e inserir os registros na tabela
+
         for ($i = 1; $i <= $numeroForms2; $i++) {
             for ($y = 1; $y <= $numeroRespostas2; $y++) {
+                $id_usuario = $this->getExistingRandomUserId();
+
                 Respostas::create([
-                    'id_forms' => '201', // Gera um nome aleatório de 10 caracteres
+                    'id_forms' => '201',
                     'id_pergunta' => '201',
-                    'id_usuario' => $this->generateRandomNumeric(4), 
-                    'resposta' => $this->generateRandomString(10), // Gera um nome aleatório de 10 caracteres
+                    'id_usuario' => $id_usuario,
+                    'resposta' => $this->generateRandomString(10),
                 ]);
             }
         }
     }
 
+    private function getExistingRandomUserId()
+    {
+        // Recupera um ID de usuário aleatório existente na tabela de respostas
+        $randomUser = Respostas::inRandomOrder()->first();
+
+        return $randomUser->id_usuario ?? null; // Retorna o ID de usuário aleatório ou null se não houver registros
+    }
+    
+    private function generateUniqueRandomNumeric($length)
+    {
+        $maxAttempts = 10;
+        $attempt = 0;
+
+        do {
+            $randomId = $this->generateRandomNumeric($length);
+
+            $exists = Respostas::where('id_usuario', $randomId)->exists();
+
+            if (!$exists) {
+                return $randomId;
+            }
+
+            $attempt++;
+        } while ($attempt < $maxAttempts);
+
+        return null;
+    }
 
     private function generateRandomNumeric($length)
     {
-        return rand(pow(10, $length-1), pow(10, $length)-1); // Gera um número aleatório de $length dígitos
+        return rand(pow(10, $length - 1), pow(10, $length) - 1);
     }
 
     private function generateRandomString($length)
     {
-        return substr(str_shuffle(str_repeat($x='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil($length/strlen($x)) )),1,$length);
+        return substr(str_shuffle(str_repeat($x = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil($length / strlen($x)))), 1, $length);
     }
 }
