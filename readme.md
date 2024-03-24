@@ -79,13 +79,16 @@ Para areas com acesso que necessite token de autenticação, adicionar ao Header
 
    - User:
      1.POST"/create-user":
+
+      O token gerado será utilizado nos outros endpoints no Header "Authorization" para permitir o aceso
+      
      ```
        input: {
               	"nome": "Nome de Teste"
               }
 
        Output:{
-              	"token": "YNBcrOlWUbw1WfR0KBS6HqM55XsGjozjLPRYoHsiwvpSCk7En7qJsrVOI3BJ"
+              	"token": "seu-token"
               }
      ```
      2.GET"/show-user":
